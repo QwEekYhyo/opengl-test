@@ -3,41 +3,7 @@
 
 #include <stdio.h>
 
-// OMG we got code-ception
-const GLchar* vertex_shader_source =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 pos;\n"
-    "void main() {\n"
-    "gl_Position = vec4(pos, 1.0f);\n"
-    "}";
-
-const GLchar* fragment_shader_source =
-    "#version 330 core\n"
-    "out vec4 frag_color;\n"
-    "void main() {\n"
-    "frag_color = vec4(0.75f, 0.0f, 0.5f, 1.0f);\n"
-    "}";
-
-int compile_shader(const GLchar** source, GLenum type, GLuint* shader_res) {
-    GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, source, NULL);
-    glCompileShader(shader);
-
-    if (shader_res)
-        *shader_res = shader;
-
-    GLint compile_success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compile_success);
-
-    if (!compile_success) {
-        GLchar info_log[512];
-        glGetShaderInfoLog(shader, sizeof(info_log), NULL, info_log);
-        printf("Error while compiling shader: %s\n", info_log);
-        return -1;
-    }
-
-    return 0;
-}
+#include <shaders.h>
 
 // Maybe I should use glfwGetWindowSize instead of keeping track of this?
 int window_width = 1280;
@@ -80,35 +46,10 @@ int main(void) {
     glfwSetWindowSizeCallback(window, window_size_func);
 
     /********** Shaders compiling **********/
-    GLuint vertex_shader;
-    error_code = compile_shader(&vertex_shader_source, GL_VERTEX_SHADER, &vertex_shader);
+    GLuint shader_program;
+    error_code = create_shader_program(&shader_program);
     if (error_code)
         goto done;
-
-    GLuint fragment_shader;
-    error_code = compile_shader(&fragment_shader_source, GL_FRAGMENT_SHADER, &fragment_shader);
-    if (error_code)
-        goto done;
-
-    GLuint shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-
-    GLint link_success;
-    glGetProgramiv(shader_program, GL_LINK_STATUS, &link_success);
-    if (!link_success) {
-        GLchar info_log[512];
-        glGetProgramInfoLog(shader_program, sizeof(info_log), NULL, info_log);
-        printf("Error while linking shader program: %s\n", info_log);
-
-        error_code = -1;
-        goto done;
-    }
-
-    // Don't need them anymore
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
 
     /********** Create and bind vertex buffer and vertex array **********/
     GLfloat vertices[] = {
