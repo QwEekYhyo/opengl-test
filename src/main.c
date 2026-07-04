@@ -10,6 +10,8 @@ int window_width = 1280;
 int window_height = 720;
 
 void window_size_func(GLFWwindow* window, int width, int height) {
+    (void)window;
+
     glViewport(0, 0, width, height);
     window_width = width;
     window_height = height;
@@ -18,7 +20,10 @@ void window_size_func(GLFWwindow* window, int width, int height) {
 int main(void) {
     int error_code = 0;
 
-    glfwInit();
+    if (!glfwInit()) {
+        perror("Failed to initialize GLFW library");
+        return -1;
+    }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -31,16 +36,16 @@ int main(void) {
 
     if (!window) {
         perror("Failed to create GLFW window");
-        error_code = -1;
-        goto done;
+        glfwTerminate();
+        return -1;
     }
 
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        perror("Failed to initialize GLAD");
-        error_code = -1;
-        goto done;
+        perror("Failed to load OpenGL functions");
+        glfwTerminate();
+        return -1;
     }
 
     glfwSetWindowSizeCallback(window, window_size_func);
