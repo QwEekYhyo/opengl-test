@@ -1,8 +1,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <math.h>
 #include <stdio.h>
 
+#include <mat4.h>
 #include <shaders.h>
 
 // Maybe I should use glfwGetWindowSize instead of keeping track of this?
@@ -59,17 +61,14 @@ int main(void) {
     /********** Create and bind vertex buffer and vertex array **********/
     GLfloat vertices[] = {
     /*       positions   |        color       */
-        -0.2f, 0.0f, 0.0f, 1.0f, 0.75f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f, 0.75f, 0.0f,
-        0.2f, 0.0f, 0.0f, 1.0f, 0.75f, 0.0f,
-        -0.1f, 0.2f, 0.0f, 0.15f, 0.75F, 0.15f,
-        0.1f, 0.2f, 0.0f, 0.15f, 0.75F, 0.15f,
-        0.0f, 0.4f, 0.0f, 0.75f, 0.0f, 0.5f,
+        -0.3f, -0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // bottom left
+        0.3f, -0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // bottom right
+        0.3f, 0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // top right
+        -0.3f, 0.3f, 0.0f, 1.0f, 0.75F, 0.0f, // top left
     };
     GLuint indices[] = {
         0, 1, 3,
-        1, 2, 4,
-        3, 4, 5,
+        1, 2, 3,
     };
 
     GLuint vbo, vao, ebo;
@@ -100,9 +99,15 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        mat4_t test = mat4(1.0f);
+        vec3_t trans = vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f);
+        mat4_translate(&test, &trans);
+        GLint transform_loc = glGetUniformLocation(shader_program, "transform");
+
         glUseProgram(shader_program);
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, value_ptr(test));
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

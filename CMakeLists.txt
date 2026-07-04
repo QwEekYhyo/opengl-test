@@ -33,6 +33,7 @@ add_custom_command(TARGET epic-game POST_BUILD
 target_link_libraries(epic-game PRIVATE
     OpenGL::GL
     glfw
+    m
 )
 
 install(TARGETS epic-game)
