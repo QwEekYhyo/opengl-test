@@ -39,6 +39,16 @@ int compile_shader(const GLchar** source, GLenum type, GLuint* shader_res) {
     return 0;
 }
 
+// Maybe I should use glfwGetWindowSize instead of keeping track of this?
+int window_width = 1280;
+int window_height = 720;
+
+void window_size_func(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+    window_width = width;
+    window_height = height;
+}
+
 int main(void) {
     int error_code = 0;
 
@@ -47,10 +57,11 @@ int main(void) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // For Mac OS apparently
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Epic Gamer Moment", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Epic Gamer Moment", NULL, NULL);
 
     if (!window) {
         perror("Failed to create GLFW window");
@@ -66,8 +77,7 @@ int main(void) {
         goto done;
     }
 
-    glViewport(0, 0, 1280, 720);
-    // TODO: set frame buffer size callback
+    glfwSetWindowSizeCallback(window, window_size_func);
 
     /********** Shaders compiling **********/
     GLuint vertex_shader;
