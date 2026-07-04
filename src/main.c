@@ -112,19 +112,31 @@ int main(void) {
 
     /********** Create and bind vertex buffer and vertex array **********/
     GLfloat vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+        -0.2f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+        0.2f, 0.0f, 0.0f,
+        -0.1f, 0.2f, 0.0f,
+        0.1f, 0.2f, 0.0f,
+        0.0f, 0.4f, 0.0f,
+    };
+    GLuint indices[] = {
+        0, 1, 3,
+        1, 2, 4,
+        3, 4, 5,
     };
 
-    GLuint vb, va;
-    glGenBuffers(1, &vb);
-    glGenVertexArrays(1, &va);
+    GLuint vbo, vao, ebo;
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glGenVertexArrays(1, &vao);
 
-    glBindVertexArray(va);
+    glBindVertexArray(vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vb);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
     glEnableVertexAttribArray(0);
@@ -140,8 +152,8 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shader_program);
-        glBindVertexArray(va);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(vao);
+        glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -149,8 +161,9 @@ int main(void) {
 
 done:
     printf("Exiting Epic Gamer Moment...\n");
-    glDeleteVertexArrays(1, &va);
-    glDeleteBuffers(1, &vb);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
     glDeleteProgram(shader_program);
 
     glfwTerminate();
