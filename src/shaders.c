@@ -73,14 +73,17 @@ int create_shader_program(GLuint* shader_program) {
             source_buffer,
             sizeof(source_buffer));
     if (error) {
+        glDeleteShader(vertex_shader);
         perror("Could not load fragment shader source");
         return error;
     }
 
     GLuint fragment_shader;
     error = compile_shader(&shader_source, GL_FRAGMENT_SHADER, &fragment_shader);
-    if (error)
+    if (error) {
+        glDeleteShader(vertex_shader);
         return error;
+    }
 
     GLuint program = glCreateProgram();
     glAttachShader(program, vertex_shader);
@@ -94,8 +97,10 @@ int create_shader_program(GLuint* shader_program) {
         glGetProgramInfoLog(program, sizeof(info_log), NULL, info_log);
         printf("Error while linking shader program: %s\n", info_log);
 
-        error = -1;
-        return error;
+        glDeleteShader(vertex_shader);
+        glDeleteShader(fragment_shader);
+
+        return -1;
     }
 
     // Don't need them anymore
