@@ -19,6 +19,27 @@ void window_size_func(GLFWwindow* window, int width, int height) {
     window_height = height;
 }
 
+void key_func(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    (void)scancode;
+    (void)mods;
+
+    static unsigned char wireframe_enabled = 0;
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, 1);
+
+    static unsigned char h_rebounce = 0;
+    if (key == GLFW_KEY_H && action == GLFW_PRESS && !h_rebounce) {
+        glPolygonMode(
+                GL_FRONT_AND_BACK,
+                wireframe_enabled ? GL_FILL : GL_LINE);
+        wireframe_enabled = ~wireframe_enabled;
+        h_rebounce = ~h_rebounce;
+    }
+    if (key == GLFW_KEY_H && action == GLFW_RELEASE && h_rebounce)
+        h_rebounce = ~h_rebounce;
+}
+
 int main(void) {
     int error_code = 0;
 
@@ -51,6 +72,7 @@ int main(void) {
     }
 
     glfwSetWindowSizeCallback(window, window_size_func);
+    glfwSetKeyCallback(window, key_func);
 
     /********** Shaders compiling **********/
     GLuint shader_program;
@@ -94,8 +116,6 @@ int main(void) {
     glBindVertexArray(0);
 
     while (!glfwWindowShouldClose(window)) {
-        // TODO: process input
-
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
