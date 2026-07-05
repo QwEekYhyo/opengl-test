@@ -3,27 +3,30 @@
 
 #include <math/vec3.h>
 
+// Uses column-major order to fit OpenGL
 typedef struct {
     float buf[16];
-} mat4_t;
+} mat4;
 
-inline float* _mat4_value_ptr(mat4_t* mat) {
+inline float* _mat4_value_ptr(mat4* mat) {
     return mat->buf;
 }
 
-#define mat4(scalar) { .buf = { \
-    scalar, 0.0f, 0.0f, 0.0f, \
-    0.0f, scalar, 0.0f, 0.0f, \
-    0.0f, 0.0f, scalar, 0.0f, \
-    0.0f, 0.0f, 0.0f, scalar  \
+#define MAT4_IDENTITY (mat4){ .buf = { \
+    1.0f, 0.0f, 0.0f, 0.0f,            \
+    0.0f, 1.0f, 0.0f, 0.0f,            \
+    0.0f, 0.0f, 1.0f, 0.0f,            \
+    0.0f, 0.0f, 0.0f, 1.0f             \
 } }
 
-#define mat4_identity() mat4(1.0f)
+mat4 mat4_translate(vec3 t);
 
-mat4_t mat4_translate(mat4_t mat, const vec3_t trans);
-void mat4_translate_inplace(mat4_t* mat, const vec3_t* trans);
+mat4 mat4_scale(vec3 s);
 
-mat4_t mat4_scale(mat4_t mat, float scale);
-mat4_t mat4_scale_non_uniform(mat4_t mat, const vec3_t scale);
+mat4 mat4_rotate_x(float angle);
+mat4 mat4_rotate_y(float angle);
+mat4 mat4_rotate_z(float angle);
+
+mat4 mat4_mul(mat4 a, mat4 b);
 
 #endif

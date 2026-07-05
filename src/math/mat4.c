@@ -1,33 +1,66 @@
 #include <math/mat4.h>
 
+#include <math.h>
+
 #include <math/vec3.h>
 
-mat4_t mat4_translate(mat4_t mat, const vec3_t trans) {
-    mat.buf[12] += trans.x;
-    mat.buf[13] += trans.y;
-    mat.buf[14] += trans.z;
-
-    return mat;
+mat4 mat4_translate(vec3 t) {
+    return (mat4){ .buf = {
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+         t.x,  t.y,  t.z, 1.0f,
+    } };
 }
 
-void mat4_translate_inplace(mat4_t* mat, const vec3_t* trans) {
-    mat->buf[12] += trans->x;
-    mat->buf[13] += trans->y;
-    mat->buf[14] += trans->z;
+mat4 mat4_scale(vec3 s) {
+    return (mat4){ .buf = {
+        s.x, 0.0f, 0.0f, 0.0f,
+        0.0f, s.y, 0.0f, 0.0f,
+        0.0f, 0.0f, s.z, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f,
+    } };
 }
 
-mat4_t mat4_scale(mat4_t mat, float scale) {
-    mat.buf[0]  *= scale;
-    mat.buf[5]  *= scale;
-    mat.buf[10] *= scale;
-
-    return mat;
+mat4 mat4_rotate_x(float angle) {
+    return (mat4){ .buf = {
+        1.0f,         0.0f,        0.0f, 0.0f,
+        0.0f,  cosf(angle), sinf(angle), 0.0f,
+        0.0f, -sinf(angle), cosf(angle), 0.0f,
+        0.0f,         0.0f,        0.0f, 1.0f,
+    } };
 }
 
-mat4_t mat4_scale_non_uniform(mat4_t mat, const vec3_t scale) {
-    mat.buf[0]  *= scale.x;
-    mat.buf[5]  *= scale.y;
-    mat.buf[10] *= scale.z;
+mat4 mat4_rotate_y(float angle) {
+    return (mat4){ .buf = {
+        cosf(angle), 0.0f, -sinf(angle), 0.0f,
+               0.0f, 1.0f,         0.0f, 0.0f,
+        sinf(angle), 0.0f,  cosf(angle), 0.0f,
+               0.0f, 0.0f,         0.0f, 1.0f,
+    } };
+}
 
-    return mat;
+mat4 mat4_rotate_z(float angle) {
+    return (mat4){ .buf = {
+         cosf(angle), sinf(angle), 0.0f, 0.0f,
+        -sinf(angle), cosf(angle), 0.0f, 0.0f,
+                0.0f,        0.0f, 1.0f, 0.0f,
+                0.0f,        0.0f, 0.0f, 1.0f,
+    } };
+}
+
+mat4 mat4_mul(mat4 a, mat4 b) {
+    mat4 r;
+
+    for (int col = 0; col < 4; col++) {
+        for (int row = 0; row < 4; row++) {
+            r.buf[col * 4 + row] =
+                a.buf[0 * 4 + row] * b.buf[col * 4 + 0] +
+                a.buf[1 * 4 + row] * b.buf[col * 4 + 1] +
+                a.buf[2 * 4 + row] * b.buf[col * 4 + 2] +
+                a.buf[3 * 4 + row] * b.buf[col * 4 + 3];
+        }
+    }
+
+    return r;
 }

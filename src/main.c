@@ -119,10 +119,18 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mat4_t transform = mat4_identity();
-        vec3_t translation = vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f);
-        transform = mat4_scale(transform, (cos(glfwGetTime()) / 4.0f) + 0.5f);
-        transform = mat4_translate(transform, translation);
+        float scale_factor = (cos(glfwGetTime()) / 4.0f) + 0.5f;
+        mat4 transform = mat4_translate(vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f));
+        transform = mat4_mul(
+                transform,
+                mat4_rotate_z(glfwGetTime())
+        );
+        transform = mat4_mul(
+                transform,
+                mat4_scale(vec3(scale_factor, scale_factor, scale_factor))
+        );
+        // translate x rotate x scale => first scale THEN rotate THEN translate
+
         GLint transform_loc = glGetUniformLocation(shader_program, "transform");
 
         glUseProgram(shader_program);

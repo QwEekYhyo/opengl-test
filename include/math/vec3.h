@@ -5,12 +5,12 @@ typedef struct {
     float x;
     float y;
     float z;
-} vec3_t;
+} vec3;
 
-inline float* _vec3_value_ptr(vec3_t* vec) {
+inline float* _vec3_value_ptr(vec3* vec) {
     return &vec->x;
 }
 
-#define vec3(x, y, z) { x, y, z }
+#define vec3(x, y, z) (vec3){ x, y, z }
 
 #endif
