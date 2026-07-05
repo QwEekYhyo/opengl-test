@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <math.h>
 #include <stdio.h>
 
 #include <math/my_math.h>
@@ -87,10 +86,31 @@ int main(void) {
         0.3f, -0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // bottom right
         0.3f, 0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // top right
         -0.3f, 0.3f, 0.0f, 1.0f, 0.75F, 0.0f, // top left
+
+        0.3f, -0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // bottom right but behind
+        0.3f, 0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // top right but behind
+                                             //
+        -0.3f, -0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // bottom left but behind
+        -0.3f, 0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // top left but behind
     };
     GLuint indices[] = {
         0, 1, 3,
         1, 2, 3,
+
+        1, 2, 4,
+        4, 5, 2,
+
+        0, 3, 6,
+        6, 7, 3,
+
+        4, 5, 6,
+        6, 7, 5,
+
+        0, 1, 4,
+        4, 6, 0,
+
+        2, 3, 5,
+        5, 7, 3,
     };
 
     GLuint vbo, vao, ebo;
@@ -119,24 +139,18 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        float scale_factor = (cos(glfwGetTime()) / 4.0f) + 0.5f;
-        mat4 transform = mat4_translate(vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f));
+        mat4 transform = mat4_rotate_y(glfwGetTime());
         transform = mat4_mul(
-                transform,
-                mat4_rotate_z(glfwGetTime())
+                transform, 
+                mat4_rotate_x(0.2f)
         );
-        transform = mat4_mul(
-                transform,
-                mat4_scale(vec3(scale_factor, scale_factor, scale_factor))
-        );
-        // translate x rotate x scale => first scale THEN rotate THEN translate
 
         GLint transform_loc = glGetUniformLocation(shader_program, "transform");
 
         glUseProgram(shader_program);
         glUniformMatrix4fv(transform_loc, 1, GL_FALSE, value_ptr(transform));
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
