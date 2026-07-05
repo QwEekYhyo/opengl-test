@@ -119,13 +119,14 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mat4_t test = mat4_identity();
-        vec3_t trans = vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f);
-        test = mat4_translate(test, trans);
+        mat4_t transform = mat4_identity();
+        vec3_t translation = vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f);
+        transform = mat4_scale(transform, (cos(glfwGetTime()) / 4.0f) + 0.5f);
+        transform = mat4_translate(transform, translation);
         GLint transform_loc = glGetUniformLocation(shader_program, "transform");
 
         glUseProgram(shader_program);
-        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, value_ptr(test));
+        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, value_ptr(transform));
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
