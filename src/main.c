@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <mat4.h>
+#include <math/my_math.h>
 #include <shaders.h>
 
 // Maybe I should use glfwGetWindowSize instead of keeping track of this?
