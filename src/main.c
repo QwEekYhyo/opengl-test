@@ -119,9 +119,9 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mat4_t test = mat4(1.0f);
+        mat4_t test = mat4_identity();
         vec3_t trans = vec3(sin(glfwGetTime()) * 0.8f, 0.0f, 0.0f);
-        mat4_translate(&test, &trans);
+        test = mat4_translate(test, trans);
         GLint transform_loc = glGetUniformLocation(shader_program, "transform");
 
         glUseProgram(shader_program);
