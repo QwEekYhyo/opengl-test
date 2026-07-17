@@ -82,16 +82,16 @@ int main(void) {
     /********** Create and bind vertex buffer and vertex array **********/
     GLfloat vertices[] = {
     /*       positions   |        color       */
-        -0.3f, -0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // bottom left
-        0.3f, -0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // bottom right
-        0.3f, 0.3f, 0.0f, 1.0f, 0.75f, 0.0f, // top right
-        -0.3f, 0.3f, 0.0f, 1.0f, 0.75F, 0.0f, // top left
+        -0.5f, -0.5f, 0.5f, 1.0f, 0.75f, 0.0f, // bottom left
+        0.5f, -0.5f, 0.5f, 1.0f, 0.75f, 0.0f, // bottom right
+        0.5f, 0.5f, 0.5f, 1.0f, 0.75f, 0.0f, // top right
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.75F, 0.0f, // top left
 
-        0.3f, -0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // bottom right but behind
-        0.3f, 0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // top right but behind
+        0.5f, -0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // bottom right but behind
+        0.5f, 0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // top right but behind
                                              //
-        -0.3f, -0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // bottom left but behind
-        -0.3f, 0.3f, -0.6f, 1.0f, 0.2f, 0.0f, // top left but behind
+        -0.5f, -0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // bottom left but behind
+        -0.5f, 0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // top left but behind
     };
     GLuint indices[] = {
         0, 1, 3,
