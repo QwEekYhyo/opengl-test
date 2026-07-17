@@ -141,16 +141,30 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mat4 transform = mat4_rotate_y(glfwGetTime());
-        transform = mat4_mul(
-                transform, 
+        // Rotate all vertices over time
+        mat4 model = mat4_rotate_y(glfwGetTime());
+        model = mat4_mul(
+                model, 
                 mat4_rotate_x(0.2f)
         );
 
-        GLint transform_loc = glGetUniformLocation(shader_program, "transform");
+        mat4 view = mat4_translate((vec3){ 0.0f, 0.0f, -3.0f });
+
+        mat4 projection = mat4_perspective(
+                RADIANS(45.0f),
+                (float)window_width / window_height,
+                0.1f, 100.0f);
+
+        GLint model_loc = glGetUniformLocation(shader_program, "model");
+        GLint view_loc = glGetUniformLocation(shader_program, "view");
+        GLint projection_loc = glGetUniformLocation(shader_program, "projection");
 
         glUseProgram(shader_program);
-        glUniformMatrix4fv(transform_loc, 1, GL_FALSE, value_ptr(transform));
+
+        glUniformMatrix4fv(model_loc, 1, GL_FALSE, value_ptr(model));
+        glUniformMatrix4fv(view_loc, 1, GL_FALSE, value_ptr(view));
+        glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection));
+
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 

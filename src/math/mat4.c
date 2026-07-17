@@ -49,6 +49,18 @@ mat4 mat4_rotate_z(float angle) {
     } };
 }
 
+mat4 mat4_perspective(float fov, float aspect, float near, float far) {
+    float f = 1.0f / tanf(fov * 0.5f);
+
+    return (mat4){ .buf = {
+        f / aspect, 0.0f,                               0.0f,  0.0f,
+              0.0f,    f,                               0.0f,  0.0f,
+              0.0f, 0.0f,        (far + near) / (near - far), -1.0f,
+              0.0f, 0.0f, (2.0f * far * near) / (near - far),  0.0f,
+    } };
+}
+
+// Column vectors
 mat4 mat4_mul(mat4 a, mat4 b) {
     mat4 r;
 

@@ -11,6 +11,6 @@
 
 #define MY_PI 3.14159265358979323846
 
-#define RADIANS(angle) (angles * MY_PI / 180.0f)
+#define RADIANS(angle) (angle * MY_PI / 180.0f)
 
 #endif

@@ -27,6 +27,8 @@ mat4 mat4_rotate_x(float angle);
 mat4 mat4_rotate_y(float angle);
 mat4 mat4_rotate_z(float angle);
 
+mat4 mat4_perspective(float fov, float aspect, float near, float far);
+
 mat4 mat4_mul(mat4 a, mat4 b);
 
 #endif
