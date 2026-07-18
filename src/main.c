@@ -113,6 +113,13 @@ int main(void) {
         5, 7, 3,
     };
 
+    // """World"""
+    vec3 cube_positions[] = {
+        { 3.0f, 2.0f, -5.0f },
+        { -2.0f, 0.0f, -2.0f },
+        { 0.0f, -2.0f, -10.0f },
+    };
+
     GLuint vbo, vao, ebo;
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -141,13 +148,6 @@ int main(void) {
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Rotate all vertices over time
-        mat4 model = mat4_rotate_y(glfwGetTime());
-        model = mat4_mul(
-                model, 
-                mat4_rotate_x(0.2f)
-        );
-
         mat4 view = mat4_translate((vec3){ 0.0f, 0.0f, -3.0f });
 
         mat4 projection = mat4_perspective(
@@ -161,12 +161,24 @@ int main(void) {
 
         glUseProgram(shader_program);
 
-        glUniformMatrix4fv(model_loc, 1, GL_FALSE, value_ptr(model));
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, value_ptr(view));
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection));
 
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+        for (unsigned int i = 0; i < sizeof(cube_positions) / sizeof(vec3); i++) {
+            mat4 model = mat4_translate(cube_positions[i]);
+            model = mat4_mul(
+                    model,
+                    mat4_rotate_y(glfwGetTime() * (1.0f+i)));
+            model = mat4_mul(
+                    model,
+                    mat4_rotate_x(glfwGetTime() * (1.0f+i)));
+
+            glUniformMatrix4fv(model_loc, 1, GL_FALSE, value_ptr(model));
+
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
