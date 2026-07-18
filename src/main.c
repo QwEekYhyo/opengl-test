@@ -3,12 +3,20 @@
 
 #include <stdio.h>
 
+#include <camera.h>
 #include <math/my_math.h>
 #include <shaders.h>
+
+#define CAMERA_SPEED 2.5f
 
 // Maybe I should use glfwGetWindowSize instead of keeping track of this?
 int window_width = 1280;
 int window_height = 720;
+
+// I really need a cleaner way to pass shit around in callbacks
+Camera cam;
+double last_frame = 0;
+double dt = 0;
 
 void window_size_func(GLFWwindow* window, int width, int height) {
     (void)window;
@@ -16,6 +24,8 @@ void window_size_func(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
     window_width = width;
     window_height = height;
+
+    cam.lens.aspect = (float)width / height;
 }
 
 void key_func(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -37,6 +47,21 @@ void key_func(GLFWwindow* window, int key, int scancode, int action, int mods) {
     }
     if (key == GLFW_KEY_H && action == GLFW_RELEASE && h_rebounce)
         h_rebounce = ~h_rebounce;
+}
+
+// This feels so stupid
+void poll_inputs(GLFWwindow* window) {
+    if (
+            glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS
+            && glfwGetKey(window, GLFW_KEY_S) == GLFW_RELEASE
+       )
+        camera_move(&cam, CAMERA_FORWARD, CAMERA_SPEED * dt);
+
+    if (
+            glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS
+            && glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE
+       )
+        camera_move(&cam, CAMERA_BACKWARD, CAMERA_SPEED * dt);
 }
 
 int main(void) {
@@ -72,6 +97,12 @@ int main(void) {
 
     glfwSetWindowSizeCallback(window, window_size_func);
     glfwSetKeyCallback(window, key_func);
+
+    camera_init(
+            &cam,
+            (vec3){ 0.0f, 0.0f, 3.0f },
+            -90.0f, 0.0f,
+            (float)window_width / window_height);
 
     /********** Shaders compiling **********/
     GLuint shader_program;
@@ -145,15 +176,14 @@ int main(void) {
     glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window)) {
+        double current_frame = glfwGetTime();
+        dt = current_frame - last_frame;
+        last_frame = current_frame;
+
+        poll_inputs(window);
+
         glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        mat4 view = mat4_translate((vec3){ 0.0f, 0.0f, -3.0f });
-
-        mat4 projection = mat4_perspective(
-                RADIANS(45.0f),
-                (float)window_width / window_height,
-                0.1f, 100.0f);
 
         GLint model_loc = glGetUniformLocation(shader_program, "model");
         GLint view_loc = glGetUniformLocation(shader_program, "view");
@@ -161,7 +191,9 @@ int main(void) {
 
         glUseProgram(shader_program);
 
+        mat4 view = camera_view_matrix(&cam);
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, value_ptr(view));
+        mat4 projection = camera_projection_matrix(&cam);
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection));
 
         glBindVertexArray(vao);
@@ -170,10 +202,10 @@ int main(void) {
             mat4 model = mat4_translate(cube_positions[i]);
             model = mat4_mul(
                     model,
-                    mat4_rotate_y(glfwGetTime() * (1.0f+i)));
+                    mat4_rotate_y(current_frame * (1.0f+i)));
             model = mat4_mul(
                     model,
-                    mat4_rotate_x(glfwGetTime() * (1.0f+i)));
+                    mat4_rotate_x(current_frame * (1.0f+i)));
 
             glUniformMatrix4fv(model_loc, 1, GL_FALSE, value_ptr(model));
 
