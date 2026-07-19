@@ -6,7 +6,7 @@
 #include <math/my_math.h>
 #include <math/vec3.h>
 
-void _camera_update_vectors(Camera* cam);
+static void _camera_update_vectors(Camera* cam);
 
 void camera_init(Camera* cam, vec3 pos, float yaw, float pitch, float aspect) {
     CameraLens* l = &cam->lens;
@@ -45,6 +45,16 @@ void camera_move(Camera* cam, CameraMove direction, float amount) {
         t->position.y -= amount * t->forward.y;
         t->position.z -= amount * t->forward.z;
         break;
+    case CAMERA_RIGHT:
+        t->position.x += amount * t->right.x;
+        t->position.y += amount * t->right.y;
+        t->position.z += amount * t->right.z;
+        break;
+    case CAMERA_LEFT:
+        t->position.x -= amount * t->right.x;
+        t->position.y -= amount * t->right.y;
+        t->position.z -= amount * t->right.z;
+        break;
     default: break;
     }
 }
@@ -71,7 +81,7 @@ mat4 camera_projection_matrix(const Camera* cam) {
             cam->lens.far_plane);
 }
 
-void _camera_update_vectors(Camera* cam) {
+static void _camera_update_vectors(Camera* cam) {
     CameraTransform* t = &cam->transform;
 
     float y = RADIANS(t->yaw);

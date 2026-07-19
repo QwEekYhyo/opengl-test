@@ -62,6 +62,18 @@ void poll_inputs(GLFWwindow* window) {
             && glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE
        )
         camera_move(&cam, CAMERA_BACKWARD, CAMERA_SPEED * dt);
+
+    if (
+            glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS
+            && glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE
+       )
+        camera_move(&cam, CAMERA_RIGHT, CAMERA_SPEED * dt);
+
+    if (
+            glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS
+            && glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE
+       )
+        camera_move(&cam, CAMERA_LEFT, CAMERA_SPEED * dt);
 }
 
 int main(void) {
