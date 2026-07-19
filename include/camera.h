@@ -45,6 +45,7 @@ typedef struct {
 void camera_init(Camera* cam, vec3 pos, float yaw, float pitch, float aspect);
 
 void camera_move(Camera* cam, CameraMove direction, float amount);
+void camera_rotate(Camera* cam, float yaw_offset, float pitch_offset);
 
 mat4 camera_view_matrix(const Camera* cam);
 mat4 camera_projection_matrix(const Camera* cam);

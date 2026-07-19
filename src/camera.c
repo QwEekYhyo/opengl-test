@@ -59,6 +59,18 @@ void camera_move(Camera* cam, CameraMove direction, float amount) {
     }
 }
 
+void camera_rotate(Camera* cam, float yaw_offset, float pitch_offset) {
+    cam->transform.yaw += yaw_offset;
+    cam->transform.pitch += pitch_offset;
+
+    if (cam->transform.pitch > 89.0f)
+        cam->transform.pitch = 89.0f;
+    if (cam->transform.pitch < -89.0f)
+        cam->transform.pitch = -89.0f;
+
+    _camera_update_vectors(cam);
+}
+
 mat4 camera_view_matrix(const Camera* cam) {
     const CameraTransform* t = &cam->transform;
 

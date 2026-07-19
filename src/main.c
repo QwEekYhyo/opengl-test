@@ -7,7 +7,8 @@
 #include <math/my_math.h>
 #include <shaders.h>
 
-#define CAMERA_SPEED 2.5f
+#define CAMERA_SPEED 3.0f
+#define CAMERA_SENSITIVITY 0.1f
 
 // Maybe I should use glfwGetWindowSize instead of keeping track of this?
 int window_width = 1280;
@@ -18,17 +19,21 @@ Camera cam;
 double last_frame = 0;
 double dt = 0;
 
-void window_size_func(GLFWwindow* window, int width, int height) {
+double cursor_posx;
+double cursor_posy;
+
+static void window_size_func(GLFWwindow* window, int width, int height) {
     (void)window;
 
     glViewport(0, 0, width, height);
+
     window_width = width;
     window_height = height;
 
     cam.lens.aspect = (float)width / height;
 }
 
-void key_func(GLFWwindow* window, int key, int scancode, int action, int mods) {
+static void key_func(GLFWwindow* window, int key, int scancode, int action, int mods) {
     (void)scancode;
     (void)mods;
 
@@ -50,7 +55,7 @@ void key_func(GLFWwindow* window, int key, int scancode, int action, int mods) {
 }
 
 // This feels so stupid
-void poll_inputs(GLFWwindow* window) {
+static void poll_inputs(GLFWwindow* window) {
     if (
             glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS
             && glfwGetKey(window, GLFW_KEY_S) == GLFW_RELEASE
@@ -74,6 +79,18 @@ void poll_inputs(GLFWwindow* window) {
             && glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE
        )
         camera_move(&cam, CAMERA_LEFT, CAMERA_SPEED * dt);
+}
+
+static void cursor_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+    (void)window;
+
+    camera_rotate(
+            &cam,
+            CAMERA_SENSITIVITY * (xpos - cursor_posx),
+            -CAMERA_SENSITIVITY * (ypos - cursor_posy));
+
+    cursor_posx = xpos;
+    cursor_posy = ypos;
 }
 
 int main(void) {
@@ -107,14 +124,19 @@ int main(void) {
         return -1;
     }
 
-    glfwSetWindowSizeCallback(window, window_size_func);
-    glfwSetKeyCallback(window, key_func);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    glfwGetCursorPos(window, &cursor_posx, &cursor_posy);
 
     camera_init(
             &cam,
             (vec3){ 0.0f, 0.0f, 3.0f },
             -90.0f, 0.0f,
             (float)window_width / window_height);
+
+    glfwSetWindowSizeCallback(window, window_size_func);
+    glfwSetKeyCallback(window, key_func);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
 
     /********** Shaders compiling **********/
     GLuint shader_program;
