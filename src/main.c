@@ -5,7 +5,8 @@
 
 #include <camera.h>
 #include <math/my_math.h>
-#include <shaders.h>
+#include <renderer/mesh.h>
+#include <renderer/shaders.h>
 
 #define CAMERA_SPEED 3.0f
 #define CAMERA_SENSITIVITY 0.1f
@@ -144,40 +145,6 @@ int main(void) {
     if (error_code)
         goto done;
 
-    /********** Create and bind vertex buffer and vertex array **********/
-    GLfloat vertices[] = {
-    /*       positions   |        color       */
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.75f, 0.0f, // bottom left
-        0.5f, -0.5f, 0.5f, 1.0f, 0.75f, 0.0f, // bottom right
-        0.5f, 0.5f, 0.5f, 1.0f, 0.75f, 0.0f, // top right
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.75F, 0.0f, // top left
-
-        0.5f, -0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // bottom right but behind
-        0.5f, 0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // top right but behind
-                                             //
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // bottom left but behind
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.2f, 0.0f, // top left but behind
-    };
-    GLuint indices[] = {
-        0, 1, 3,
-        1, 2, 3,
-
-        1, 2, 4,
-        4, 5, 2,
-
-        0, 3, 6,
-        6, 7, 3,
-
-        4, 5, 6,
-        6, 7, 5,
-
-        0, 1, 4,
-        4, 6, 0,
-
-        2, 3, 5,
-        5, 7, 3,
-    };
-
     // """World"""
     vec3 cube_positions[] = {
         { 3.0f, 2.0f, -5.0f },
@@ -185,27 +152,7 @@ int main(void) {
         { 0.0f, -2.0f, -10.0f },
     };
 
-    GLuint vbo, vao, ebo;
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-    glGenVertexArrays(1, &vao);
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // Unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    Mesh cube_mesh = mesh_cube();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -230,7 +177,7 @@ int main(void) {
         mat4 projection = camera_projection_matrix(&cam);
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection));
 
-        glBindVertexArray(vao);
+        glBindVertexArray(cube_mesh.vao);
 
         for (unsigned int i = 0; i < sizeof(cube_positions) / sizeof(vec3); i++) {
             mat4 model = mat4_translate(cube_positions[i]);
@@ -243,7 +190,7 @@ int main(void) {
 
             glUniformMatrix4fv(model_loc, 1, GL_FALSE, value_ptr(model));
 
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, cube_mesh.index_count, GL_UNSIGNED_INT, 0);
         }
 
         glfwSwapBuffers(window);
@@ -252,9 +199,7 @@ int main(void) {
 
 done:
     printf("Exiting Epic Gamer Moment...\n");
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
+    mesh_destroy(&cube_mesh);
     glDeleteProgram(shader_program);
 
     glfwTerminate();
