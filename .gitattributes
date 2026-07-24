@@ -1,3 +1,2 @@
-src/glad.c linguist-vendored=true
-include/KHR/** linguist-vendored=true
-include/glad/** linguist-vendored=true
+src/external/** linguist-vendored=true
+include/external/** linguist-vendored=true
