@@ -7,6 +7,7 @@
 #include <math/my_math.h>
 #include <renderer/mesh.h>
 #include <renderer/shaders.h>
+#include <renderer/texture.h>
 
 #define CAMERA_SPEED 3.0f
 #define CAMERA_SENSITIVITY 0.1f
@@ -153,6 +154,8 @@ int main(void) {
     };
 
     Mesh cube_mesh = mesh_cube();
+    Texture stone_tex;
+    generate_texture(&stone_tex, "assets/stone.png");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -178,6 +181,7 @@ int main(void) {
         glUniformMatrix4fv(projection_loc, 1, GL_FALSE, value_ptr(projection));
 
         glBindVertexArray(cube_mesh.vao);
+        glBindTexture(GL_TEXTURE_2D, stone_tex.object_name);
 
         for (unsigned int i = 0; i < sizeof(cube_positions) / sizeof(vec3); i++) {
             mat4 model = mat4_translate(cube_positions[i]);
