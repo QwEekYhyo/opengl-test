@@ -7,6 +7,7 @@
 #include <math/my_math.h>
 #include <renderer/mesh.h>
 #include <renderer/shaders.h>
+#include <renderer/texture.h>
 
 #define CAMERA_SPEED 3.0f
 #define CAMERA_SENSITIVITY 0.1f
@@ -153,6 +154,7 @@ int main(void) {
     };
 
     Mesh cube_mesh = mesh_cube();
+    Texture
 
     glEnable(GL_DEPTH_TEST);
 
