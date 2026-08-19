@@ -17,7 +17,8 @@ int generate_texture(Texture* tex, const char* filename) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    // TODO: handle n_channels better
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, n_channels == 4 ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
@@ -25,4 +26,8 @@ int generate_texture(Texture* tex, const char* filename) {
     tex->object_name = texture_id;
 
     return 0;
+}
+
+void texture_destroy(Texture* texture) {
+    glDeleteTextures(1, &texture->object_name);
 }

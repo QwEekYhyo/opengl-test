@@ -9,4 +9,6 @@ typedef struct {
 
 int generate_texture(Texture* texture, const char* filename);
 
+void texture_destroy(Texture* texture);
+
 #endif

@@ -155,7 +155,10 @@ int main(void) {
 
     Mesh cube_mesh = mesh_cube();
     Texture stone_tex;
-    generate_texture(&stone_tex, "assets/stone.png");
+    if (generate_texture(&stone_tex, "assets/stone.png") < 0) {
+        printf("Error while generating stone texture\n");
+        goto done;
+    }
 
     glEnable(GL_DEPTH_TEST);
 
@@ -201,9 +204,10 @@ int main(void) {
         glfwPollEvents();
     }
 
-done:
+done: // TODO: get rid of this label
     printf("Exiting Epic Gamer Moment...\n");
     mesh_destroy(&cube_mesh);
+    texture_destroy(&stone_tex);
     glDeleteProgram(shader_program);
 
     glfwTerminate();
